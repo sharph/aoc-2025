@@ -21,17 +21,14 @@ fn main() -> io::Result<()> {
             };
             Some((from, to))
         })
-        .flat_map(|(from, to)| from..to + 1)
+        .flat_map(|(from, to)| from..=to)
         .filter(|n| {
             let s = n.to_string();
             (1..=s.len() / 2).filter(|n| s.len() % n == 0).any(|n| {
-                let (patt, _) = s.split_at(n);
-                let mut cmp = String::with_capacity(s.len());
-                while cmp.len() < s.len() {
-                    cmp.push_str(patt);
-                }
-                assert_eq!(cmp.len(), s.len());
-                cmp == s
+                let (patt, rest) = s.split_at(n);
+                (0..s.len() / n - 1)
+                    .map(|x| x * n..x * n + n)
+                    .all(|r| rest[r] == *patt)
             })
         })
         .sum();
